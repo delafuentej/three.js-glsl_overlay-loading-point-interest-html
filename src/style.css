@@ -28,7 +28,7 @@ body
     transition: transform 0.5s;
     will-change: transform;
 } */
-
+/* loading bar */
 .loading-bar {
     position: absolute;
     top: 50%;
@@ -59,4 +59,62 @@ body
    
     transform-origin: 100% 0;
     transition: transform 1.5s ease-in-out;
+}
+/* point */
+.point {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 15px;
+    height: 15px;
+    /* background: #ff00ff; */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 1.5s infinite alternate;
+}
+
+.point .label {
+    position: relative;
+    top: -20px;
+    left: -20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #00000080;
+    border: 2px solid #00ffff;
+    color: white;
+    text-align: center;
+    line-height: 40px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: help;
+    transform: scale(0,0);
+    transition: transform 0.3s;
+}
+
+.point .text {
+    position: absolute;
+    top: 30px;
+    left: -120px;
+    width: 200px;
+   padding: 20px;
+    border-radius: 15px;
+    background: #00000080;
+    border: 2px solid #00ffff;
+    color: white;
+    text-align: center;
+    line-height:1.3rem;
+    font-weight: bold;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+.point:hover .text{
+    opacity: 1;
+   
+}
+
+.point.visible .label {
+    transform: scale(1,1);
 }

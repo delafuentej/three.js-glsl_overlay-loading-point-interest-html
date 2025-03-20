@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import overlayVertexShader from './shaders/overlay/vertex.glsl';
 import overlayFragmentShader from './shaders/overlay/fragment.glsl';
 import { gsap } from 'gsap';
+
 /**
  * Better intro & html loader
  * - We are going to add a simple loader so that the scene appears nicely
@@ -29,12 +30,19 @@ import { gsap } from 'gsap';
  * 2. LOADING: PROGRESS-BAR
  * For the shake of the lesson( Mixing WebGL with HTML), we will add the bar in the HTML, but we could have create a new plane with a shader
  *  To update the bar. We are going to update the bar in the progress callback of the LoadingManager
- * 
+ * 3. MIXING HTML & WEBGL
+ * - We are going to integrate HTML into the WebGL scene like if the DOM ELEMENT were part of the WebGL.
+ * We will add interest points to the model
+ * We are going to store the points in a array. 
  */
+
+
+
 
 /**
  * Loaders
  */
+let sceneReady = false;
 
 const loadingBar = document.querySelector('.loading-bar');
 
@@ -42,13 +50,32 @@ const loadingBar = document.querySelector('.loading-bar');
 const loadingManager = new THREE.LoadingManager(
     //Loaded
     () => {
-       gsap.delayedCall(0.5, () => {
+    //    gsap.delayedCall(0.5, () => {
             
-                gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 3, value: 0, delay: 1})
-                loadingBar.classList.add('loaded');
-                loadingBar.style.transform = '';
+    //             gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 3, value: 0, delay: 1})
+    //             loadingBar.classList.add('loaded');
+    //             
+    //             sceneReady = true;
            
-        })
+    //     })
+    window.setTimeout(() =>
+        {
+            // Animate overlay
+            gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0, delay: 1 })
+
+            // Update loadingBarElement
+            loadingBar.classList.add('loaded')
+            loadingBar.style.transform = ''
+        }, 500)
+
+        window.setTimeout(() =>
+        {
+            sceneReady = true
+        }, 2000)
+
+        window.setTimeout(() => {
+            sceneReady = true;  
+        }, 2000);
     },
     //Progress
     (itemUrl, itemsLoaded, itemsTotal) => {
@@ -142,7 +169,29 @@ gltfLoader.load(
         updateAllMaterials();
     }
 );
+/**
+ * RAY CASTER
+ */
+const raycaster = new THREE.Raycaster();
+/**
+ * Points of interest
+ */
+const points =[
+    {
+        position: new THREE.Vector3(1.55, 0.3, -0.6),
+        element: document.querySelector('.point-0')
+    },
+    {
+        position: new THREE.Vector3(0.5, 0.8, -1.6),
+        element: document.querySelector('.point-1')
+    },
+    {
+        position: new THREE.Vector3(1.6, -1.3, -0.7),
+        element: document.querySelector('.point-2')
+    },
 
+
+]
 /**
  * Lights
  */
@@ -211,6 +260,43 @@ const tick = () =>
     // Update controls
     controls.update();
 
+    //scene ready
+    if(sceneReady){
+               //Go through each point
+    for(const point of points){
+        const screenPosition = point.position.clone();
+        screenPosition.project(camera);
+
+        //raycaster
+        raycaster.setFromCamera(screenPosition, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+
+        if(intersects.length === 0)
+        {
+            point.element.classList.add('visible');
+        }else{
+            //distance from object
+            const intersectionDistance = intersects[0].distance;
+            //distance from point
+            const pointDistance = point.position.distanceTo(camera.position);
+           // point.element.classList.remove('visible');
+            if(intersectionDistance < pointDistance)
+            {
+                point.element.classList.remove('visible');
+            }else{
+                point.element.classList.add('visible');
+            }
+        };
+    
+        const translateX = screenPosition.x * sizes.width * 0.5;
+        const translateY = - screenPosition.y * sizes.height * 0.5;
+        //update the point element with the transformX -CSS
+        point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+
+    }
+
+    }
+ 
     // Render
     renderer.render(scene, camera);
 
