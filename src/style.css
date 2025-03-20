@@ -1,0 +1,62 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    overflow: hidden;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
+/* .loading-bar{
+    position:absolute;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: #ffffff;
+    transform: scaleX(0);
+    transform-origin: top left;
+    transition: transform 0.5s;
+    will-change: transform;
+} */
+
+.loading-bar {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 10px; /* Aumentamos el grosor para mayor impacto */
+    background: linear-gradient(90deg, #ff00ff, #00ffff); /* Efecto de degradado */
+    border-radius: 5px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease-in-out;
+    will-change: transform;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+    animation: pulseGlow 1.5s infinite alternate;
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.9);
+    }
+}
+
+
+.loading-bar.loaded{
+   
+    transform-origin: 100% 0;
+    transition: transform 1.5s ease-in-out;
+}
